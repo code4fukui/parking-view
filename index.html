@@ -1,0 +1,79 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<title>鯖江市駐車場状況 リアルタイムオープンデータ</title>
+</head><body>
+<h1>鯖江市駐車場状況</h1>
+<div class=fig>
+  <div>嚮陽会館駐車場</div>
+  <div id=fig1></div>
+</div>
+<div class=fig>
+  <div>ふれあい広場駐車場</div>
+  <div id=fig2></div>
+</div>
+<hr>
+駐車場リアルタイムオープンデータ提供: CC BY <a href=https://www.city.sabae.fukui.jp/>鯖江市役所</a>
+
+<script type="module">
+import { fetchViaProxy } from "./fetchViaProxy.js";
+import { CSV } from "https://js.sabae.cc/CSV.js";
+import { createParkingFig } from "./createParkingFig.js";
+
+const fetchParkingData = async () => {
+  const url = "http://mixsoda.io:2048/testtest.csv?from=-6000000";
+  //const url = "http://mixsoda.io:2048/testtest.csv?from=-6";
+  const csv = await fetchViaProxy(url);
+  const data = CSV.toJSON(CSV.decode(csv));
+  console.log(data);
+  const iccids = [
+    "8981040000001207740",
+    "8981040000001207757",
+  ];
+  const flg_space = [
+    0,
+    1,
+  ];
+  const getLast = (iccid, def) => {
+    for (let i = data.length - 1; i >= 0; i--) {
+      if (data[i].iccid == iccid) {
+        return parseInt(data[i].data, 10);
+      }
+    }
+    return def;
+  };
+  const figs = [fig1, fig2];
+  for (let i = 0; i < iccids.length; i++) {
+    const fig = figs[i];
+    const iccid = iccids[i];
+    const last = getLast(iccid, flg_space[i]);
+    fig.appendChild(createParkingFig(last != flg_space[i]));
+  }
+  return data;
+};
+await fetchParkingData();
+setTimeout(async () => {
+  await fetchParkingData();
+}, 60 * 1000); // 1min
+
+</script>
+
+<style>
+body {
+  text-align: center;
+  font-family: sans-serif;
+  margin: 0;
+}
+h1 {
+  padding: 1em;
+  background-color: #77aa77;
+  color: white;
+  font-size: 5vw;
+}
+.fig > div {
+  font-size: 130%;
+}
+a {
+  color: gray !important;
+}
+</style>
+
+</body></html>
