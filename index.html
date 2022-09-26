@@ -45,12 +45,13 @@ const fetchParkingData = async () => {
     const fig = figs[i];
     const iccid = iccids[i];
     const last = getLast(iccid, flg_space[i]);
+    fig.innerHTML = "";
     fig.appendChild(createParkingFig(last != flg_space[i]));
   }
   return data;
 };
 await fetchParkingData();
-setTimeout(async () => {
+setInterval(async () => {
   await fetchParkingData();
 }, 60 * 1000); // 1min
 
@@ -63,10 +64,15 @@ body {
   margin: 0;
 }
 h1 {
-  padding: 1em;
+  margin: 0 0 1em 0;
+  padding: .5em;
   background-color: #77aa77;
   color: white;
   font-size: 5vw;
+}
+.fig {
+  display: inline-block;
+  margin: 1em;
 }
 .fig > div {
   font-size: 130%;
