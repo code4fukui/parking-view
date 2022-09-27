@@ -1,29 +1,65 @@
 <!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
 <title>鯖江市駐車場状況 リアルタイムオープンデータ</title>
 </head><body>
+
 <h1>鯖江市駐車場状況</h1>
-<div class=fig>
-  <div>嚮陽会館前駐車場</div>
-  <div id=fig1></div>
-</div>
-<div class=fig>
-  <div>ふれあい広場駐車場</div>
-  <div id=fig2></div>
-</div>
+
+<main id=main></main>
+
 <hr>
 駐車場リアルタイムオープンデータ提供: CC BY <a href=https://www.city.sabae.fukui.jp/>鯖江市役所</a>
+(<a href=https://data.city.sabae.lg.jp/opendata-list/>データシティ鯖江 オープンデータ一覧</a>)
 
 <script type="module">
 import { fetchViaProxy } from "./fetchViaProxy.js";
 import { CSV } from "https://js.sabae.cc/CSV.js";
 import { createParkingFig } from "./createParkingFig.js";
+import { XML } from "https://js.sabae.cc/XML.js";
+import { DateTime } from "https://js.sabae.cc/DateTime.js";
+
+const fetchParkingInfo = async () => {
+  const url = "https://data.odp.jig.jp/rdf/jp/fukui/sabae/201.rdf";
+  const xml = await fetchViaProxy(url);
+  const json = XML.toJSON(xml);
+  return json;
+};
+
+const names = ["嚮陽会館前駐車場", "ふれあい広場駐車場"];
+const info = await fetchParkingInfo();
+const parking = [];
+const lastUpdate = new DateTime().toStringMin();
+for (const name of names) {
+  const p = info["rdf:RDF"]["jrrk:ParkingFacility"].find(p => p["rdfs:label"]["#text"] == name);
+  parking.push({
+    name,
+    address: p["jrrk:address"]["#text"],
+    price: p["schema:price"]["#text"],
+    capacity: p["jrrk:capacity"]["#text"],
+    lastUpdate,
+  });
+}
+
+let id = 1;
+for (const p of parking) {
+  const div = document.createElement("div");
+  div.innerHTML = `
+    <div class=name>${p.name}</div>
+    <div id=fig${id++} class=indicator></div>
+    <div class="small address"><b>住所:</b> ${p.address}</div>
+    <div class="small price"><b>料金:</b> ${p.price}</div>
+    <div class="small capacity"><b>収容台数:</b> ${p.capacity}台</div>
+    <div class="small lastUpdate"><b>最終更新日時:</b> ${p.lastUpdate}</div>
+  `;
+  div.className = "fig";
+  main.appendChild(div);
+}
 
 const fetchParkingData = async () => {
   const url = "http://mixsoda.io:2048/testtest.csv?from=-6000000";
   //const url = "http://mixsoda.io:2048/testtest.csv?from=-6";
   const csv = await fetchViaProxy(url);
   const data = CSV.toJSON(CSV.decode(csv));
-  console.log(data);
+  //console.log(data);
   const iccids = [
     "8981040000001207740",
     "8981040000001207757",
@@ -50,6 +86,7 @@ const fetchParkingData = async () => {
   }
   return data;
 };
+
 await fetchParkingData();
 setInterval(async () => {
   await fetchParkingData();
@@ -64,7 +101,7 @@ body {
   margin: 0;
 }
 h1 {
-  margin: 0 0 1em 0;
+  margin: 0 0 .2em 0;
   padding: .5em;
   background-color: #77aa77;
   color: white;
@@ -76,6 +113,13 @@ h1 {
 }
 .fig > div {
   font-size: 130%;
+  max-width: 400px;
+}
+.fig .small {
+  font-size: 100%;
+}
+.fig .indicator {
+  margin: 10px;
 }
 a {
   color: gray !important;
