@@ -1,96 +1,64 @@
 <!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
-<title>鯖江市駐車場状況 リアルタイムオープンデータ</title>
+<title>鯖江市営駐車場状況</title>
 </head><body>
 
-<h1>鯖江市駐車場状況</h1>
+<h1>鯖江市営駐車場状況</h1>
 
-<main id=main></main>
+<main id=main>
+<div id=lastUpdate></div>
+<div id=table></div>
+※空き情報の更新タイミングには時間差がございます。
+</main>
 
 <hr>
 駐車場リアルタイムオープンデータ提供: CC BY <a href=https://www.city.sabae.fukui.jp/>鯖江市役所</a>
 (<a href=https://data.city.sabae.lg.jp/opendata-list/>データシティ鯖江 オープンデータ一覧</a>)
 
 <script type="module">
-import { fetchViaProxy } from "./fetchViaProxy.js";
-import { CSV } from "https://js.sabae.cc/CSV.js";
-import { createParkingFig } from "./createParkingFig.js";
-import { XML } from "https://js.sabae.cc/XML.js";
+import { getParking, updateParking } from "./parking.js";
 import { DateTime } from "https://js.sabae.cc/DateTime.js";
 
-const fetchParkingInfo = async () => {
-  const url = "https://data.odp.jig.jp/rdf/jp/fukui/sabae/201.rdf";
-  const xml = await fetchViaProxy(url);
-  const json = XML.toJSON(xml);
-  return json;
+const parking = await getParking();
+
+const cr = (tag, p) => {
+  const res = document.createElement(tag);
+  p.appendChild(res);
+  return res;
 };
-
-const names = ["嚮陽会館前駐車場", "ふれあい広場駐車場"];
-const info = await fetchParkingInfo();
-const parking = [];
-const lastUpdate = new DateTime().toStringMin();
-for (const name of names) {
-  const p = info["rdf:RDF"]["jrrk:ParkingFacility"].find(p => p["rdfs:label"]["#text"] == name);
-  parking.push({
-    name,
-    address: p["jrrk:address"]["#text"],
-    price: p["schema:price"]["#text"],
-    capacity: p["jrrk:capacity"]["#text"],
-    lastUpdate,
-  });
+const tbl = cr("table", table);
+const tr = cr("tr", tbl);
+for (const name of ["名称", "満空状況", "収容台数", "住所", "利用料金"]) {
+  const th = cr("th", tr);
+  tr.appendChild(th, tr);
+  th.textContent = name;
 }
-
 let id = 1;
 for (const p of parking) {
-  const div = document.createElement("div");
-  div.innerHTML = `
-    <div class=name>${p.name}</div>
-    <div id=fig${id++} class=indicator></div>
-    <div class="small address"><b>住所:</b> ${p.address}</div>
-    <div class="small price"><b>料金:</b> ${p.price}</div>
-    <div class="small capacity"><b>収容台数:</b> ${p.capacity}台</div>
-    <div class="small lastUpdate"><b>最終更新日時:</b> ${p.lastUpdate}</div>
-  `;
-  div.className = "fig";
-  main.appendChild(div);
+  const tr = cr("tr", tbl);
+  for (const name of ["name", null, "capacity", "address", "price"]) {
+    const td = cr("td", tr);
+    if (!name) {
+      td.id = "fig" + id++;
+    } else {
+      td.textContent = p[name].replace(/。/g, "。\n") + (name == "capacity" ? "台" : "");
+      td.className = name;
+    }
+  }
 }
 
-const fetchParkingData = async () => {
-  const url = "http://mixsoda.io:2048/testtest.csv?from=-6000000";
-  //const url = "http://mixsoda.io:2048/testtest.csv?from=-6";
-  const csv = await fetchViaProxy(url);
-  const data = CSV.toJSON(CSV.decode(csv));
-  //console.log(data);
-  const iccids = [
-    "8981040000001207740",
-    "8981040000001207757",
-  ];
-  const flg_space = [
-    0,
-    1,
-  ];
-  const getLast = (iccid, def) => {
-    for (let i = data.length - 1; i >= 0; i--) {
-      if (data[i].iccid == iccid) {
-        return parseInt(data[i].data, 10);
-      }
-    }
-    return def;
-  };
-  const figs = [fig1, fig2];
-  for (let i = 0; i < iccids.length; i++) {
-    const fig = figs[i];
-    const iccid = iccids[i];
-    const last = getLast(iccid, flg_space[i]);
-    fig.innerHTML = "";
-    fig.appendChild(createParkingFig(last != flg_space[i]));
+const update = async () => {
+  await updateParking(parking);
+  for (let i = 0; i < parking.length; i++) {
+    const flg = parking[i].full;
+    const fig = document.getElementById("fig" + (i + 1));
+    fig.textContent = flg ? "満車" : "空車";
+    fig.className = flg ? "full" : "space";
   }
-  return data;
+  const d = new DateTime();
+  lastUpdate.textContent = `${d.day.year}年${d.day.month}月${d.day.day}日 ${d.time.hour}時${d.time.min}分 現在`;
 };
-
-await fetchParkingData();
-setInterval(async () => {
-  await fetchParkingData();
-}, 60 * 1000); // 1min
+update();
+setInterval(update, 60 * 1000); // 1min
 
 </script>
 
@@ -107,19 +75,37 @@ h1 {
   color: white;
   font-size: 5vw;
 }
-.fig {
+main {
+  text-align: left;
+  max-width: 90vw;
   display: inline-block;
   margin: 1em;
 }
-.fig > div {
-  font-size: 130%;
-  max-width: 400px;
+table {
+  display: inline-block;
+  border-collapse: collapse;
+  border: 1px solid black;
 }
-.fig .small {
-  font-size: 100%;
+td, th {
+  border: 1px solid black;
+  padding: .2em .8em;
 }
-.fig .indicator {
-  margin: 10px;
+th {
+  background-color: #ddd;
+  text-align: center;
+  font-weight: normal;
+}
+.name, .capacity, .full, .space, .address {
+  text-align: center;
+}
+.price {
+  white-space: pre-wrap;
+}
+.full {
+  color: red;
+}
+.space {
+  color: blue;
 }
 a {
   color: gray !important;
