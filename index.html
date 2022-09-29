@@ -54,7 +54,8 @@ for (const p of parking) {
         if (name == "name") {
           const a = cr("a", td);
           a.target = "_blank";
-          a.href = `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`;
+          //a.href = `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`;
+          a.href = `https://maps.google.com/?ll=${p.lat},${p.lng}`;
           a.textContent = s;
         } else {
           td.textContent = s;
