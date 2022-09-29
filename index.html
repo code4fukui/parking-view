@@ -27,21 +27,33 @@ const cr = (tag, p) => {
 };
 const tbl = cr("table", table);
 const tr = cr("tr", tbl);
-for (const name of ["名称", "満空状況", "収容台数", "住所", "利用料金"]) {
+for (const name of ["名称", "満空状況", "収容台数", "営業時間", "利用料金"]) {
   const th = cr("th", tr);
   tr.appendChild(th, tr);
   th.textContent = name;
 }
 let id = 1;
+const lastp = {};
 for (const p of parking) {
   const tr = cr("tr", tbl);
-  for (const name of ["name", null, "capacity", "address", "price"]) {
-    const td = cr("td", tr);
+  const omitname = ["open", "price"];
+  for (const name of ["name", null, "capacity", "open", "price"]) {
     if (!name) {
+      const td = cr("td", tr);
       td.id = "fig" + id++;
     } else {
-      td.textContent = p[name].replace(/。/g, "。\n") + (name == "capacity" ? "台" : "");
-      td.className = name;
+      const s = p[name].replace(/。/g, "。\n") + (name == "capacity" ? "台" : "");
+      if (lastp[name]?.name == p[name]) {
+        const rs = lastp[name].td.getAttribute("rowspan") || 1;
+        lastp[name].td.setAttribute("rowspan", rs + 1);
+      } else {
+        const td = cr("td", tr);
+        td.textContent = s;
+        td.className = name;
+        if (omitname.indexOf(name) >= 0) {
+          lastp[name] = { name: p[name], td };
+        }
+      }
     }
   }
 }

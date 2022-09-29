@@ -59,6 +59,7 @@ export const getParking = async () => {
       address: p["jrrk:address"]["#text"],
       price: p["schema:price"]["#text"],
       capacity: p["jrrk:capacity"]["#text"],
+      open: "24時間",
     });
   }
   return parking;
