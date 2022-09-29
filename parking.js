@@ -54,12 +54,25 @@ export const getParking = async () => {
   const parking = [];
   for (const name of names) {
     const p = info["rdf:RDF"]["jrrk:ParkingFacility"].find(p => p["rdfs:label"]["#text"] == name);
+    const get = (name) => {
+      const rdf = p["ic:地理座標"]["rdf:Description"];
+      if (rdf) {
+        return rdf["ic:" + name] ? rdf["ic:" + name]["#text"] : rdf["ipa:" + name]["#text"];
+      }
+      const rdf2 = p["ipa:地理座標"]["rdf:Description"];
+      if (rdf2) {
+        return rdf2["ic:" + name] ? rdf2["ic:" + name]["#text"] : rdf2["ipa:" + name]["#text"];
+      }
+      return null;
+    }
     parking.push({
       name,
       address: p["jrrk:address"]["#text"],
       price: p["schema:price"]["#text"],
       capacity: p["jrrk:capacity"]["#text"],
       open: "24時間",
+      lat: get("緯度"),
+      lng: get("経度"),
     });
   }
   return parking;

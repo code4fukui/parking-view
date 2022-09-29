@@ -11,12 +11,15 @@
 </main>
 
 <hr>
+<footer>
 駐車場リアルタイムオープンデータ提供: CC BY <a href=https://www.city.sabae.fukui.jp/>鯖江市役所</a>
 (<a href=https://data.city.sabae.lg.jp/opendata-list/>データシティ鯖江 オープンデータ一覧</a>)
+</footer>
 
 <script type="module">
 import { getParking, updateParking } from "./parking.js";
 import { DateTime } from "https://js.sabae.cc/DateTime.js";
+import { setAutoTransposeTable } from "./transposeTable.js";
 
 const parking = await getParking();
 
@@ -48,7 +51,14 @@ for (const p of parking) {
         lastp[name].td.setAttribute("rowspan", rs + 1);
       } else {
         const td = cr("td", tr);
-        td.textContent = s;
+        if (name == "name") {
+          const a = cr("a", td);
+          a.target = "_blank";
+          a.href = `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`;
+          a.textContent = s;
+        } else {
+          td.textContent = s;
+        }
         td.className = name;
         if (omitname.indexOf(name) >= 0) {
           lastp[name] = { name: p[name], td };
@@ -57,6 +67,8 @@ for (const p of parking) {
     }
   }
 }
+
+setAutoTransposeTable(tbl, 600);
 
 const update = async () => {
   await updateParking(parking);
@@ -107,7 +119,7 @@ th {
   text-align: center;
   font-weight: normal;
 }
-.name, .capacity, .full, .space, .address {
+.name, .capacity, .full, .space, .address, .open {
   text-align: center;
 }
 .price {
@@ -119,7 +131,7 @@ th {
 .space {
   color: blue;
 }
-a {
+footer a {
   color: gray !important;
 }
 </style>
