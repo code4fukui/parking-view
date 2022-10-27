@@ -51,6 +51,7 @@ export const updateParking = async (parking) => {
 export const getParking = async () => {
   const names = ["嚮陽会館前駐車場", "ふれあい広場駐車場"];
   const info = await fetchParkingInfo();
+  console.log(info);
   const parking = [];
   for (const name of names) {
     const p = info["rdf:RDF"]["jrrk:ParkingFacility"].find(p => p["rdfs:label"]["#text"] == name);

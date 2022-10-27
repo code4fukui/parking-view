@@ -40,7 +40,7 @@ const lastp = {};
 for (const p of parking) {
   const tr = cr("tr", tbl);
   const omitname = ["open", "price"];
-  for (const name of ["name", null, "capacity", "open", "price"]) {
+  for (const name of ["name", null, "capacity", "address", "price"]) { // "open"
     if (!name) {
       const td = cr("td", tr);
       td.id = "fig" + id++;
@@ -51,12 +51,12 @@ for (const p of parking) {
         lastp[name].td.setAttribute("rowspan", rs + 1);
       } else {
         const td = cr("td", tr);
-        if (name == "name") {
+        if (name == "name" || name == "address") {
           const a = cr("a", td);
           a.target = "_blank";
           //a.href = `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`;
-          //a.href = `https://maps.google.com/?ll=${p.lat},${p.lng}`;
-          a.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name)}`;
+          a.href = `https://maps.google.com/?ll=${p.lat},${p.lng}`;
+          //a.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name)}`;
           a.textContent = s;
         } else {
           td.textContent = s;
@@ -135,6 +135,9 @@ th {
 }
 footer a {
   color: gray !important;
+}
+a {
+  color: #333 !important;
 }
 </style>
 
