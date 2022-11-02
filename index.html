@@ -2,19 +2,25 @@
 <title>鯖江市営駐車場満車・空車状況</title>
 </head><body>
 
+<!--
 <h1>鯖江市営駐車場満車・空車状況</h1>
+-->
 
 <main id=main>
 <div id=lastUpdate></div>
 <div id=table></div>
+<!--
 ※空き情報の更新タイミングには時間差がございます。名称を選択すると地図が表示されます。
+-->
 </main>
 
+<!--
 <hr>
 <footer>
 駐車場リアルタイムオープンデータ提供: CC BY <a href=https://www.city.sabae.fukui.jp/>鯖江市役所</a>
 (<a href=https://data.city.sabae.lg.jp/opendata-list/>データシティ鯖江 オープンデータ一覧</a>)
 </footer>
+-->
 
 <script type="module">
 import { getParking, updateParking } from "./parking.js";
@@ -30,7 +36,7 @@ const cr = (tag, p) => {
 };
 const tbl = cr("table", table);
 const tr = cr("tr", tbl);
-for (const name of ["名称", "満空状況", "収容台数", "営業時間", "利用料金"]) {
+for (const name of ["名称", "満空状況", "収容台数", "住所", "利用料金"]) {
   const th = cr("th", tr);
   tr.appendChild(th, tr);
   th.textContent = name;
@@ -51,7 +57,7 @@ for (const p of parking) {
         lastp[name].td.setAttribute("rowspan", rs + 1);
       } else {
         const td = cr("td", tr);
-        if (name == "name" || name == "address") {
+        if (false) { // name == "name" || name == "address") {
           const a = cr("a", td);
           a.target = "_blank";
           //a.href = `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`;
