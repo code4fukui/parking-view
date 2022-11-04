@@ -25,7 +25,8 @@
 <script type="module">
 import { getParking, updateParking } from "./parking.js";
 import { DateTime } from "https://js.sabae.cc/DateTime.js";
-import { setAutoTransposeTable } from "./transposeTable.js";
+//import { setAutoTransposeTable } from "./transposeTable.js";
+import { transposeTable } from "./transposeTable.js";
 
 const parking = await getParking();
 
@@ -76,7 +77,8 @@ for (const p of parking) {
   }
 }
 
-setAutoTransposeTable(tbl, 600);
+//setAutoTransposeTable(tbl, 600);
+transposeTable(tbl);
 
 const update = async () => {
   await updateParking(parking);
