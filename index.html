@@ -85,8 +85,14 @@ const update = async () => {
   for (let i = 0; i < parking.length; i++) {
     const flg = parking[i].full;
     const fig = document.getElementById("fig" + (i + 1));
-    fig.textContent = flg ? "満車" : "空車";
+    const child = document.createElement("span");
+    child.textContent = flg ? "満車" : "空車";
+    fig.appendChild(child);
     fig.className = flg ? "full" : "space";
+    if ( fig.getElementsByTagName("span").length > 1 ) {
+      const rm_child = fig.getElementsByTagName("span")[0];
+      fig.removeChild(rm_child);
+    }
   }
   const d = new DateTime();
   lastUpdate.textContent = `${d.day.year}年${d.day.month}月${d.day.day}日 ${d.time.hour}時${d.time.min}分 現在`;
@@ -139,12 +145,15 @@ th {
   color: white;
   font-weight: bolder;
   font-size:2em;
+  letter-spacing: 0.1em;
 }
-.full {
+.full span{
   background-color: red;
+  padding: 0.05em 0.3em 0.05em 0.4em;
 }
-.space {
-  background-color: green;
+.space span{
+  background-color: blue;
+  padding: 0.05em 0.3em 0.05em 0.4em;
 }
 footer a {
   color: gray !important;
