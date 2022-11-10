@@ -86,7 +86,7 @@ const update = async () => {
     const flg = parking[i].full;
     const fig = document.getElementById("fig" + (i + 1));
     const child = document.createElement("span");
-    child.textContent = flg ? "満 車" : "空 車";
+    child.textContent = flg ? "満車" : "空車";
     fig.appendChild(child);
     fig.className = flg ? "full" : "space";
     if ( fig.getElementsByTagName("span").length > 1 ) {
