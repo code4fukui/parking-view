@@ -1,6 +1,6 @@
 # parking-view
- 
-https://code4fukui.github.io/parking-view/
+
+- [鯖江市営駐車場満車・空車状況](https://code4fukui.github.io/parking-view/)
 
 ## Usage
 
