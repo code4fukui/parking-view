@@ -12,7 +12,7 @@ const parking = await getParking();
 const update = async () => {
   await updateParking(parking);
   console.log(parking);
-  setTimeout(show, 60 * 1000);
+  setTimeout(update, 60 * 1000);
 };
 update();
 ```
