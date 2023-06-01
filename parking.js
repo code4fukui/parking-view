@@ -10,7 +10,7 @@ const fetchParkingInfo = async () => {
 };
 
 const fetchParkingData = async () => {
-  const url = "https://mixsoda.io:2048/testtest_b.csv?from=-6000000"
+  const url = "https://mixsoda.io:2048/testtest_b.csv?from=-6000000";
   //const url = "http://mixsoda.io:2048/testtest.csv?from=-6000000";
   //const url = "http://mixsoda.io:2048/testtest.csv?from=-6";
   const csv = await fetchViaProxy(url);
