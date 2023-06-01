@@ -10,14 +10,17 @@ const fetchParkingInfo = async () => {
 };
 
 const fetchParkingData = async () => {
-  const url = "http://mixsoda.io:2048/testtest.csv?from=-6000000";
+  const url = "https://mixsoda.io:2048/testtest_b.csv?from=-6000000"
+  //const url = "http://mixsoda.io:2048/testtest.csv?from=-6000000";
   //const url = "http://mixsoda.io:2048/testtest.csv?from=-6";
   const csv = await fetchViaProxy(url);
   const data = CSV.toJSON(CSV.decode(csv));
   //console.log(data);
   const iccids = [
-    "8981040000001207740",
-    "8981040000001207757",
+    //"8981040000001207740",
+    //"8981040000001207757",
+    "8981040000001404255",
+    "8981040000001404248",
   ];
   const flg_space = [
     0,
