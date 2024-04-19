@@ -23,7 +23,8 @@ const fetchParkingData = async () => {
     "8981040000001404248",
   ];
   const flg_space = [
-    0,
+    //0,
+    1,
     1,
   ];
   const getLast = (iccid, def) => {
