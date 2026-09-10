@@ -74,7 +74,7 @@ export const getParking = async () => {
       name,
       address: p["jrrk:address"]["#text"],
       price: p["schema:price"]["#text"],
-      capacity: p["jrrk:capacity"]["#text"],
+      capacity: name==names[0] ? "85" : p["jrrk:capacity"]["#text"],
       open: "24時間",
       lat: get("緯度"),
       lng: get("経度"),
